@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Houses</title>
@@ -17,7 +17,7 @@
 </head>
 <body>
 <form onsubmit="return parseTextToHouses()">
-    <label for="houses">Indtast din liste af huse her, fx "(1,11,5) (2,6,7)":</label>
+    <label for="houses">Enter your list of building here, eg "(1,11,5) (2,6,7)":</label>
     <textarea id="houses" name="houses"></textarea>
     <input type="submit">
 </form>
@@ -163,6 +163,8 @@
             // get the leftmost of the two
             var left = leftSkyline[li];
             var right = rightSkyline[ri];
+
+            // Make sure we halt when out of bounds
             if (left == undefined) {
                 left = 1000000;
             }
@@ -170,6 +172,7 @@
                 right = 1000000;
             }
 
+            // Pick the smaller
             if (left < right) {
                 x = leftSkyline[li]; // 23
                 if (leftSkyline[li + 1] != undefined) {
