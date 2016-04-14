@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <meta charset="UTF-8">
     <title>Houses</title>
@@ -24,26 +24,40 @@
 <canvas id="render"></canvas>
 
 <script>
-
-
+    // Config drawing
     var canvasHeight = 512;
     var canvasWidth = 512;
     var dadsWidth = 30; // The width, from assignment
     var extraThick = 10;
     var bottomLineHeight = canvasHeight - 20;
+    var dadsFactor = (canvasWidth / dadsWidth);
     var canvas = document.getElementById("render");
     canvas.height = canvasHeight;
     canvas.width = canvasWidth;
-
     var ctx = canvas.getContext("2d");
     var stdThick = ctx.lineWidth;
+    var stdColor = ctx.strokeStyle;
 
-
-    ctx.beginPath();
+    // Calculate stuff
+    var houses = [
+        [2, 6, 7],
+        [3, 13, 9]
+    ];
 
     // Draw bottom line (thick)
+    ctx.beginPath();
     drawBottomLine();
-    ctx.lineWidth = stdThick;
+    ctx.closePath();
+
+    // Draw the houses
+    ctx.beginPath();
+    houses.forEach(function(house) { drawHouse(house)});
+    ctx.closePath();
+
+    // Draw the skyline
+    ctx.beginPath();
+    drawSkyline([2, 6, 3, 13, 9]);
+    ctx.closePath();
 
     /*
      var houses = [
@@ -65,10 +79,9 @@
         ctx.stroke();
 
         // Draw the ticks
-        for (i = 0; i <= dadsWidth; i += 5) {
-            drawLineTick(i * (canvasWidth / dadsWidth), bottomLineHeight);
+        for (var i = 0; i <= dadsWidth; i += 5) {
+            drawLineTick(i * dadsFactor, bottomLineHeight);
         }
-
     }
 
     function drawLineTick(x, y) {
@@ -97,9 +110,10 @@
     }
 
     function drawHouse(house) {
-        var actualLeft = house[0] * (canvasWidth / dadsWidth);
-        var actualRight = house[2] * (canvasWidth / dadsWidth);
-        var actualHeight = house[1] * (canvasWidth / dadsWidth); // Maybe make this a function of the tallest building
+        ctx.lineWidth = 5;
+        var actualLeft = house[0] * dadsFactor;
+        var actualRight = house[2] * dadsFactor;
+        var actualHeight = house[1] * dadsFactor; // Maybe make this a function of the tallest building
 
         // Go to left point
         ctx.moveTo(actualLeft, bottomLineHeight);
@@ -111,7 +125,40 @@
         // Line down
         ctx.lineTo(actualRight, bottomLineHeight);
         ctx.stroke();
+    }
 
+    /**
+     * Draws the skyline based on the list of points
+     * @param points
+     */
+    function drawSkyline(points) {
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#ff0000';
+
+        ctx.moveTo(points[0] * dadsFactor, bottomLineHeight);
+
+        for (var i = 0; i <= points.length; i += 2) {
+            var actualLeft = points[i] * dadsFactor;
+            var actualHeight = bottomLineHeight - (points[i + 1] * dadsFactor);
+            var actualRight = points[i + 2] * dadsFactor;
+
+            if (actualHeight > 0) {
+                ctx.lineTo(actualLeft, actualHeight);
+            }
+            if (actualRight > 0) {
+                ctx.lineTo(actualRight, actualHeight);
+            }
+        }
+        ctx.lineTo(points[points.length - 1] * dadsFactor, bottomLineHeight);
+        ctx.stroke();
+    }
+
+    function calculateSkyline(houses) {
+        // Split the houses
+
+        // Run recursively on the houses
+
+        // Combine
     }
 </script>
 </body>
