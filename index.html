@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Houses</title>
+
+    <style>
+        label {
+            display: inline-block;
+            width: 200px;
+        }
+
+        input {
+            width: 312px;
+        }
+    </style>
+</head>
+<body>
+<form onsubmit="return parseTextToHouses()">
+    <label for="houses">Indtast din liste af huse her, fx "(1,11,5) (2,6,7)":</label>
+    <textarea id="houses" name="houses"></textarea>
+    <input type="submit">
+</form>
+<canvas id="render"></canvas>
+
+<script>
+
+
+    var canvasHeight = 512;
+    var canvasWidth = 512;
+    var dadsWidth = 30; // The width, from assignment
+    var extraThick = 10;
+    var bottomLineHeight = canvasHeight - 20;
+    var canvas = document.getElementById("render");
+    canvas.height = canvasHeight;
+    canvas.width = canvasWidth;
+
+    var ctx = canvas.getContext("2d");
+    var stdThick = ctx.lineWidth;
+
+
+    ctx.beginPath();
+
+    // Draw bottom line (thick)
+    drawBottomLine();
+    ctx.lineWidth = stdThick;
+
+    /*
+     var houses = [
+     [1, 11, 5],
+     [2, 6, 7],
+     [3, 13, 9],
+     [12, 7, 16],
+     [14, 3, 25],
+     [19, 18, 22],
+     [23, 13, 29],
+     [24, 4, 28]
+     ];*/
+
+
+    function drawBottomLine() {
+        ctx.lineWidth = extraThick;
+        ctx.moveTo(0, bottomLineHeight);
+        ctx.lineTo(canvasWidth, bottomLineHeight);
+        ctx.stroke();
+
+        // Draw the ticks
+        for (i = 0; i <= dadsWidth; i += 5) {
+            drawLineTick(i * (canvasWidth / dadsWidth), bottomLineHeight);
+        }
+
+    }
+
+    function drawLineTick(x, y) {
+        ctx.lineWidth = stdThick;
+        ctx.moveTo(x, y - 10);
+        ctx.lineTo(x, y + 10);
+        ctx.stroke();
+    }
+
+    function parseTextToHouses() {
+        // Get the value
+        var housesString = document.getElementById('houses').value;
+        var houseRegEx = /\(\d+,\d+,\d+\)/gm;
+        var valRegEx = /\d+/gm;
+
+        var houses = housesString.match(houseRegEx).map(function (houseString) {
+            return houseString.match(valRegEx);
+        });
+
+        //  Draw houses
+        houses.forEach(function (house) {
+            drawHouse(house);
+        });
+
+        return false;
+    }
+
+    function drawHouse(house) {
+        var actualLeft = house[0] * (canvasWidth / dadsWidth);
+        var actualRight = house[2] * (canvasWidth / dadsWidth);
+        var actualHeight = house[1] * (canvasWidth / dadsWidth); // Maybe make this a function of the tallest building
+
+        // Go to left point
+        ctx.moveTo(actualLeft, bottomLineHeight);
+        // Line up
+        ctx.lineTo(actualLeft, bottomLineHeight - actualHeight);
+        // Line right
+        ctx.lineTo(actualRight, bottomLineHeight - actualHeight);
+
+        // Line down
+        ctx.lineTo(actualRight, bottomLineHeight);
+        ctx.stroke();
+
+    }
+</script>
+</body>
+</html>
