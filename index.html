@@ -2,28 +2,130 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Houses</title>
+    <title>Skyline</title>
 
+
+    <link rel="stylesheet" href="reset.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <style>
+        .container {
+            width: 514px;
+            margin: 2em auto;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 1em;
+        }
+
+        form {
+            width: 514px;
+        }
+
         label {
             display: inline-block;
             width: 200px;
         }
 
+        textarea {
+            float: right;
+            width: 300px;
+        }
+
         input {
-            width: 312px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
-<form onsubmit="return parseTextToHouses()">
-    <label for="houses">Enter your list of building here, eg "(1,11,5) (2,6,7)":</label>
-    <textarea id="houses" name="houses"></textarea>
-    <input type="submit">
-</form>
-<canvas id="render"></canvas>
+<div class="container">
+    <h1>Skyline visualizer</h1>
+    <form onsubmit="return parseTextToHouses()">
+        <label for="houses">Enter your list of buildings here, eg "(1,11,5) (2,6,7)":</label>
+        <textarea id="houses" name="houses"></textarea>
+        <div></div>
+        <input type="submit">
+    </form>
+    <canvas id="render"></canvas>
+</div>
 
 <script>
+    /**
+     * The recursive algorithm to compute the skyline
+     */
+    function calculateSkyline(houses) {
+        if (houses.length === 1) {
+            // Return the coordinates for this house
+            return houses[0];
+        }
+
+        // Split the houses
+        var halfPoint = Math.ceil(houses.length / 2);
+        var leftSide = houses.slice(0, halfPoint);
+        var rightSide = houses.slice(halfPoint);
+
+        // Run recursively on the houses
+        var leftSkyline = calculateSkyline(leftSide);
+        var rightSkyline = calculateSkyline(rightSide);
+
+        // Combine
+        var skyline = [];
+
+        var ri = 0;
+        var li = 0;
+        var lHeight = 0;
+        var rHeight = 0;
+        var x = 0;
+        while (leftSkyline.length >= li || rightSkyline.length >= ri) {
+            // get the leftmost of the two
+            var left = leftSkyline[li];
+            var right = rightSkyline[ri];
+
+            // Make sure we halt when out of bounds
+            if (left == undefined) {
+                left = 1000000;
+            }
+            if (right == undefined) {
+                right = 1000000;
+            }
+
+            // Pick the smaller
+            if (left < right) {
+                x = leftSkyline[li]; // 23
+                if (leftSkyline[li + 1] != undefined) {
+                    lHeight = leftSkyline[li + 1]; // 13
+                }
+                else {
+                    lHeight = 0;
+                }
+                li += 2;
+            }
+            else {
+                x = rightSkyline[ri];
+
+                if (rightSkyline[ri + 1] != undefined) {
+                    rHeight = rightSkyline[ri + 1];
+                }
+                else {
+                    rHeight = 0;
+                }
+                ri += 2;
+            }
+
+            skyline.push(x);
+
+            if (ri < rightSkyline.length || li < leftSkyline.length) {
+                skyline.push(Math.max(lHeight, rHeight));
+            }
+        }
+        return skyline;
+    }
+
+
     // Config drawing
     var canvasHeight = 512;
     var canvasWidth = 512;
@@ -37,8 +139,6 @@
     var ctx = canvas.getContext("2d");
     var stdThick = ctx.lineWidth;
     var stdColor = ctx.strokeStyle;
-
-
 
 
     function drawBottomLine() {
@@ -69,7 +169,9 @@
         var houses = housesString.match(houseRegEx).map(function (houseString) {
             return houseString
                     .match(valRegEx)
-                    .map(function(val) { return parseInt(val)}); // Make sure they are ints
+                    .map(function (val) {
+                        return parseInt(val)
+                    }); // Make sure they are ints
         });
 
         ctx.beginPath();
@@ -141,74 +243,6 @@
         ctx.lineTo(points[points.length - 1] * dadsFactor, bottomLineHeight);
         ctx.stroke();
         ctx.strokeStyle = stdColor;
-    }
-
-    function calculateSkyline(houses) {
-        if (houses.length === 1) {
-            // Return the coordinates for this house
-            return houses[0];
-        }
-
-        // Split the houses
-        var halfPoint = Math.ceil(houses.length / 2);
-        var leftSide = houses.slice(0, halfPoint);
-        var rightSide = houses.slice(halfPoint);
-
-        // Run recursively on the houses
-        var leftSkyline = calculateSkyline(leftSide);
-        var rightSkyline = calculateSkyline(rightSide);
-
-        // Combine
-        var skyline = [];
-
-        var ri = 0;
-        var li = 0;
-        var lHeight = 0;
-        var rHeight = 0;
-        var x = 0;
-        while (leftSkyline.length >= li || rightSkyline.length >= ri) {
-            // get the leftmost of the two
-            var left = leftSkyline[li];
-            var right = rightSkyline[ri];
-
-            // Make sure we halt when out of bounds
-            if (left == undefined) {
-                left = 1000000;
-            }
-            if (right == undefined) {
-                right = 1000000;
-            }
-
-            // Pick the smaller
-            if (left < right) {
-                x = leftSkyline[li]; // 23
-                if (leftSkyline[li + 1] != undefined) {
-                    lHeight = leftSkyline[li + 1]; // 13
-                }
-                else {
-                    lHeight = 0;
-                }
-                li += 2;
-            }
-            else {
-                x = rightSkyline[ri];
-
-                if (rightSkyline[ri + 1] != undefined) {
-                    rHeight = rightSkyline[ri + 1];
-                }
-                else {
-                    rHeight = 0;
-                }
-                ri += 2;
-            }
-
-            skyline.push(x);
-
-            if (ri < rightSkyline.length || li < leftSkyline.length) {
-                skyline.push(Math.max(lHeight, rHeight));
-            }
-        }
-        return skyline;
     }
 </script>
 </body>
