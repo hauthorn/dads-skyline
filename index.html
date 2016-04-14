@@ -75,6 +75,10 @@
                     .map(function(val) { return parseInt(val)}); // Make sure they are ints
         });
 
+        ctx.beginPath();
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        ctx.closePath();
+
         // Draw the houses
         ctx.beginPath();
         houses.forEach(function (house) {
@@ -134,6 +138,7 @@
         }
         ctx.lineTo(points[points.length - 1] * dadsFactor, bottomLineHeight);
         ctx.stroke();
+        ctx.strokeStyle = stdColor;
     }
 
     function calculateSkyline(houses) {
