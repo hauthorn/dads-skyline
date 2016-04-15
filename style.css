@@ -1,0 +1,31 @@
+.container {
+    width: 514px;
+    margin: 2em auto;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+h1 {
+    font-size: 2em;
+    margin-bottom: 1em;
+}
+
+form {
+    width: 514px;
+}
+
+label {
+    display: inline-block;
+    width: 200px;
+}
+
+textarea {
+    float: right;
+    width: 300px;
+}
+
+input {
+    width: 100%;
+}
