@@ -38,8 +38,25 @@ function calculateSkyline(houses) {
             right = 1000000;
         }
 
+        if (left == right) {
+            x = left; // Pick one
+            if (leftSkyline[li + 1] != undefined) {
+                lHeight = leftSkyline[li + 1];
+            }
+            else {
+                lHeight = 0;
+            }
+            if (rightSkyline[ri + 1] != undefined) {
+                rHeight = rightSkyline[ri + 1];
+            }
+            else {
+                rHeight = 0;
+            }
+            li += 2;
+            ri += 2;
+        }
         // Pick the smaller
-        if (left < right) {
+        else if (left < right) {
             x = leftSkyline[li];
             if (leftSkyline[li + 1] != undefined) {
                 lHeight = leftSkyline[li + 1];
