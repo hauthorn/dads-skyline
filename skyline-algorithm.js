@@ -40,9 +40,9 @@ function calculateSkyline(houses) {
 
         // Pick the smaller
         if (left < right) {
-            x = leftSkyline[li]; // 23
+            x = leftSkyline[li];
             if (leftSkyline[li + 1] != undefined) {
-                lHeight = leftSkyline[li + 1]; // 13
+                lHeight = leftSkyline[li + 1];
             }
             else {
                 lHeight = 0;
